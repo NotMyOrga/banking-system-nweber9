@@ -7,11 +7,24 @@ public class Bank {
     private final Map<Person, BankAccount> bankAccounts = new HashMap<>();
 
     public void registerCustomer(Person person, double initialDeposit) {
-        // TODO: Create and store a new Customer based on the person.Person
+        if (!bankAccounts.containsKey(person)) {
+            bankAccounts.put(person, new BankAccount(person, initialDeposit));
+        }
     }
 
     public boolean transfer(Person from, Person to, double amount) {
-        // TODO: Check if both are registered customers and perform transfer
+        BankAccount sender = bankAccounts.get(from);
+        BankAccount receiver = bankAccounts.get(to);
+
+        if (sender == null || receiver == null) {
+            return false;
+        }
+
+        if (sender.withdraw(amount)) {
+            receiver.deposit(amount);
+            return true;
+        }
+
         return false;
     }
 
