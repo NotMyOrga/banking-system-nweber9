@@ -27,16 +27,24 @@ public class OnlineShop {
     }
 
     public void addToCart(Person buyer, ShopItem item){
-        // TODO: Add the item to the buyer's cart. If the buyer doesn't have a cart yet, create one.
+        shoppingCarts.computeIfAbsent(buyer, k -> new ArrayList<>()).add(item);
     }
 
     public boolean placeOrder(Person buyer) {
-        // TODO:
-        // 1. Check if the buyer has a cart.
-        // 2. Sum the total price of all items in the cart.
-        // 3. Use the bank to transfer the total amount from the buyer to the shop owner.
-        // 4. If successful, store the sold items for potential refund and clear the buyer's cart.
-        // 5. Return true if purchase succeeded, false otherwise.
-        return false;
+        List<ShopItem> cart = shoppingCarts.get(buyer);
+        if (cart == null || cart.isEmpty()) {
+            return false;
+        }
+
+        double total = cart.stream().mapToDouble(ShopItem::getPrice).sum();
+
+        boolean success = bank.transfer(buyer, shopOwner, total);
+        if (!success) {
+            return false;
+        }
+        
+        cart.clear();
+
+        return true;
     }
 }
